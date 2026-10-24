@@ -39,6 +39,14 @@ module.exports = async function handler(req, res) {
     },
     redirect: "follow",
   };
+
+  // 关键：把调用方带来的 Cookie 继续往下传
+  // gptimage 的轮询接口和取图接口都靠 gptimage2_guest_image_visitor 认身份，
+  // 少了这个头就会 404 NOT_FOUND
+  if (req.headers.cookie) {
+    init.headers["Cookie"] = req.headers.cookie;
+  }
+
   if (body !== undefined && body.length) init.body = body;
 
   // ---- 转发 ----
@@ -74,4 +82,3 @@ module.exports = async function handler(req, res) {
 
 // 中转要给上游留足时间
 module.exports.config = { maxDuration: 60 };
-
